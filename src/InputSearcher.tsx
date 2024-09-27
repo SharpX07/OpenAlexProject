@@ -35,7 +35,7 @@ const InputPage: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://192.168.3.192:5000/get_search_metrics?query=${searchValue}&type=work`);
+                const response = await fetch(`http://192.168.2.120:5000/get_search_metrics?query=${searchValue}&type=work`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
