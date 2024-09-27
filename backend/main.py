@@ -96,20 +96,25 @@ def get_search():
         return jsonify({"error": "Invalid query type"}), 400
 
 
-@app.route('/get_author_details', methods=['GET'])
-def get_author_details():
-    author_id = request.args.get('author_id', '')
+@app.route('/get_search_metrics', methods=['GET'])
+def get_search_metrics():
+    query = request.args.get('query', '')
 
-    if not author_id:
+    if not query:
         return jsonify({"error": "Author ID parameter is missing"}), 400
-
-    author = pa.Authors().get_details(author_id)
-
-    if author:
-        return jsonify(author)
-    else:
-        return jsonify({"error": "Author not found"}), 404
-
+    
+    results = pa.Works().search(query).group_by('publication_year').get()
+    
+    # for element in results:
+        # element["key"] = int(element["key"])
+    results_json = []
+    for result in results:
+        element = {
+            "year": result["key"],
+            "count": result["count"]
+        }
+        results_json.append(element)
+    return jsonify(results_json)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
