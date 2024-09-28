@@ -8,6 +8,22 @@ body {
   flex-direction: column;
 }
 
+.searcher-autocomplete-results
+{
+  /* background-color: #45a049; */
+}
+.searcher-autocomplete-item
+{
+  /* background-color: aqua; */
+  padding: 0%;
+}
+
+.searcher-autocomplete-item-text
+{
+  margin: 0%;
+  font-size: 11px;
+}
+
 .footer-searcher {
   text-align: center;
   padding-left: 20px;

@@ -1,55 +1,113 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pyalex as pa
+import requests
+from requestOA import requestOpenAlex
+
+from search_metrics import search_metrics
 
 app = Flask(__name__)
 CORS(app)  # Esto habilita CORS para toda la aplicación
 
-
 @app.route('/autocomplete', methods=['GET'])
 def get_autocomplete():
-    types = ["author", "work", "institution"]
     query = request.args.get('query', '')
     query_type = request.args.get('type', 'author')
 
     if not query:
         return jsonify({"error": "Query parameter is missing"}), 400
-
-    results_json = []
-
+    
     if query_type == "author":
-        results = pa.Authors().autocomplete(query)
-        for result in results:
-            element = {
-                "principal_value": result["display_name"],
-                "secondary_value": result["works_count"],
-                "tertiary_value": result["cited_by_count"],
-                "id": result["short_id"].split("/")[-1]
-            }
-            results_json.append(element)
+        url = f"autocomplete/authors?q={query}"
     elif query_type == "work":
-        results = pa.Works().autocomplete(query)
-        for result in results:
-            element = {
-                "principal_value": result["display_name"],
-                "secondary_value": result["hint"],
-                "tertiary_value": result["cited_by_count"],
-                "id": result["short_id"].split("/")[-1]
-            }
-            results_json.append(element)
+        url = f"autocomplete/works?q={query}"
     elif query_type == "institution":
-        results = pa.Institutions().autocomplete(query)
+        url = f"autocomplete/institutions?q={query}"
+    else:
+        return jsonify({"error": "Invalid query type"}), 400
+    
+    response = requestOpenAlex(url)
+    if response is not None:
+        results,_ = response
+        results_json = []
+        i=0
         for result in results:
-            element = {
-                "principal_value": result["display_name"],
-                "secondary_value": result["works_count"],
-                "tertiary_value": result["cited_by_count"],
-                "id": result["short_id"].split("/")[-1]
-            }
+            i+=1
+            if query_type == "author":
+                element = {
+                    "principal_value": result["display_name"],
+                    "secondary_value": result.get("works_count", 0),
+                    "tertiary_value": result.get("cited_by_count", 0),
+                    "id": result["id"].split("/")[-1]
+                }
+            elif query_type == "work":
+                element = {
+                    "principal_value": result["display_name"],
+                    "secondary_value": result.get("hint", ''),
+                    "tertiary_value": result.get("cited_by_count", 0),
+                    "id": result["id"].split("/")[-1]
+                }
+            elif query_type == "institution":
+                element = {
+                    "principal_value": result["display_name"],
+                    "secondary_value": result.get("works_count", 0),
+                    "tertiary_value": result.get("cited_by_count", 0),
+                    "id": result["id"].split("/")[-1]
+                }
             results_json.append(element)
+        return jsonify(results_json)
+    else:
+        return jsonify({"error": "Failed to fetch data from OpenAlex"}), response.status_code
+
+    
+
+@app.route('/results', methods=['GET'])  # Cambiar el endpoint a /results
+def get_results():
+    types = ["author", "work", "institution"]
+    query = request.args.get('query', '')
+    query_type = request.args.get('type', 'author')
+    page = request.args.get('page', 1, type=int)  # Obtener el número de página, por defecto 1
+    per_page = request.args.get('per_page', 10, type=int)  # Obtener cuántos resultados por página, por defecto 10
+    
+    if query_type == "author":
+        url = f"authors?search={query}&page={page}&per-page={per_page}"
+    elif query_type == "work":
+        url = f"works?search={query}&page={page}&per-page={per_page}"
+    elif query_type == "institution":
+        url = f"institutions?search={query}&page={page}&per-page={per_page}"
     else:
         return jsonify({"error": "Invalid query type"}), 400
 
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch data from OpenAlex"}), response.status_code
+    
+    response = requests.get(url)
+    results_json = []
+    
+    results = response.json().get("results", [])
+    for result in results:
+        if query_type == "author":
+            element = {
+                "principal_value": result["display_name"],
+                "secondary_value": result.get("works_count", 0),
+                "tertiary_value": result.get("cited_by_count", 0),
+                "id": result["id"].split("/")[-1]
+            }
+        elif query_type == "work":
+            element = {
+                "principal_value": result["display_name"],
+                "secondary_value": result.get("publication_date", ''),
+                "tertiary_value": result.get("cited_by_count", 0),
+                "id": result["id"].split("/")[-1]
+            }
+        elif query_type == "institution":
+            element = {
+                "principal_value": result["display_name"],
+                "secondary_value": result.get("works_count", 0),
+                "tertiary_value": result.get("cited_by_count", 0),
+                "id": result["id"].split("/")[-1]
+            }
+        results_json.append(element)
     return jsonify(results_json)
 
 
@@ -57,7 +115,7 @@ def get_autocomplete():
 def get_search():
     query = request.args.get('id_query', '')
     query_type = request.args.get('type', 'author')
-
+    
     if not query:
         return jsonify({"error": "Query parameter is missing"}), 400
     elif query_type == "work":
@@ -96,6 +154,7 @@ def get_search():
         return jsonify({"error": "Invalid query type"}), 400
 
 
+<<<<<<< Updated upstream
 @app.route('/get_author_details', methods=['GET'])
 def get_author_details():
     author_id = request.args.get('author_id', '')
@@ -110,6 +169,9 @@ def get_author_details():
     else:
         return jsonify({"error": "Author not found"}), 404
 
+=======
+app.register_blueprint(search_metrics)
+>>>>>>> Stashed changes
 
 if __name__ == '__main__':
     app.run(debug=True)

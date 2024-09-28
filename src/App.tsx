@@ -1,9 +1,10 @@
-import { SetStateAction, useState } from 'react'
+import { SetStateAction, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 import Lupa from './assets/lupa.svg'
 import { ReactSVG } from 'react-svg';
-// import viteLogo from '/vite.svg'
 import './App.css'
 
+<<<<<<< Updated upstream
 import { Chart } from "react-google-charts";
 
 
@@ -34,27 +35,84 @@ export const options = {
     
 //   );
 
+=======
+interface Result {
+  principal_value: string,
+  secondary_value: string,
+  tertiary_value: string
+}
+>>>>>>> Stashed changes
 
 
 const SearcherForm = () => {
+  const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
-
-  const [mensajeFlask, setEstadisticas] = useState('');
-
+  
+  const handleClick = () => {
+    navigate(`/input?search=${searchValue}`);
+  };
   const handleInputChange = (event: { target: { value: SetStateAction<string>; }; }) => {
     setSearchValue(event.target.value);
-  };
-
-  const handleClick = () => {
-    window.location.href = `/input?search=${searchValue}`;
   };
 
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     handleClick();
-    // obtenerEstadisticas();
-    // console.log(mensajeFlask);
   };
+
+  const [data, setData] = useState<Result[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (searchValue.trim() === '') {
+      setData([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://192.168.2.120:5000/autocomplete?query=${searchValue}&type=work`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: Result[] = await response.json();
+        setData(data);
+      } catch (error) {
+        setError(error as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (searchValue) {
+      fetchData();
+    }
+  }, [searchValue]);
+
+  const resultAutocomplete = () => {
+    if (searchValue == ""){
+      return null
+    }
+
+    if (error) {
+      return <p>Error: {error.message}</p>
+    }
+    if (loading) {
+      return <p>Loading...</p>
+    }
+
+    return (<ul className='searcher-autocomplete-results'>
+      {data.slice(0,5).map((result, index) => (
+        <li className='searcher-autocomplete-item' key={index}>
+          <p className='searcher-autocomplete-item-text'><b>{result.principal_value}</b></p>
+          <p className='searcher-autocomplete-item-text'>Works Count: {result.secondary_value}</p>
+          <p className='searcher-autocomplete-item-text'>Cited By Count: {result.tertiary_value}</p>
+        </li>
+      ))}
+    </ul>)
+  }
 
   return (
     <div className="container-searcher">
@@ -70,6 +128,7 @@ const SearcherForm = () => {
           <ReactSVG src={Lupa} className="from-searcher-button-img" />
         </button>
       </form>
+<<<<<<< Updated upstream
       <Chart
       // Bar is the equivalent chart type for the material design version.
       chartType="BarChart"
@@ -78,6 +137,9 @@ const SearcherForm = () => {
       data={data}
       options={options}
     />
+=======
+      {resultAutocomplete()}
+>>>>>>> Stashed changes
     </div>
   );
 };
