@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import BarChart from './components/barChart';
+import SearcherForm from './components/SearcherForm';
 import { ResultBarChart } from './components/barChart';
 import { QueryResults, QueryResult } from './components/queryResults';
 import {
@@ -150,6 +151,8 @@ const InputPage: React.FC = () => {
 
     return (
         <div className='bg-[#f2f0e8]'>
+            <SearcherForm></SearcherForm>
+            
             <BoxContainer>
                 <h1>Resultados de la búsqueda</h1>
                 <p>Buscaste: {searchValue}</p>
