@@ -63,6 +63,8 @@ def get_results():
 
     url = f"{query_type}?search={query}&page={page}&per-page={per_page}"    
     
+    print(url)
+    
     response = requestOpenAlex(url,"results")
     
     if response is not None:

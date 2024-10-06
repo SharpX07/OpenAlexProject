@@ -4,7 +4,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        oa_background : 'f1efe7',
+        oa_background : 'f2f0e8',
+        oa_border: 'd5bdaf',
+        oa_white: 'f8f8f7',
         // Agrega más colores personalizados si lo deseas
       },
     },

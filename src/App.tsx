@@ -32,7 +32,7 @@ const SearcherForm = () => {
     isid = true;
     handleClick();
   };
-  
+
   const handleInputChange = (event: { target: { value: SetStateAction<string>; }; }) => {
     setSearchValue(event.target.value);
   };
@@ -118,24 +118,21 @@ const SearcherForm = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center h-[90vh]">
-      <img className="w-1/5 max-w-[100px] h-auto mb-5" src="logo.png" alt="Logo" />
-      <form className='w-[90%] flex max-w-[600px]' onSubmit={handleSubmit}>
-        <div className="relative w-full">
-          <input
-            className={`bg-[#f8f8f7] border border-[#D5BDAF] text-black w-full h-[40px] px-4 py-2 ${isVisible? 'rounded-t-[12px]':'rounded-[12px]'} focus:outline-none pr-[40px]`} // Aumentar padding a la derecha
-            type='text'
-            placeholder='Procure pesquisadores especializados em sua área...'
-            value={searchValue}
-            onChange={handleInputChange}
-          />
-          <button className='absolute right-2 -translate-y-[38px] bg-transparent border-none rounded-[5px] flex items-center justify-center p-2 hover:bg-[#2d3336]' type='button' onClick={handleClick}>
-            <ReactSVG src={Lupa} className="w-[20px] h-[20px] text-[rgb(120,220,220)]" />
-          </button>
-          {resultAutocomplete()}
-        </div>
-      </form>
-    </div>
+    <form className='w-[90%] flex max-w-[600px]' onSubmit={handleSubmit}>
+      <div className="relative w-full">
+        <input
+          className={`bg-[#f8f8f7] border border-[#D5BDAF] text-black w-full h-[40px] px-4 py-2 ${isVisible ? 'rounded-t-[12px]' : 'rounded-[12px]'} focus:outline-none pr-[40px]`} // Aumentar padding a la derecha
+          type='text'
+          placeholder='Procure pesquisadores especializados em sua área...'
+          value={searchValue}
+          onChange={handleInputChange}
+        />
+        <button className='absolute right-2 -translate-y-[38px] bg-transparent border-none rounded-[5px] flex items-center justify-center p-2 hover:bg-[#2d3336]' type='button' onClick={handleClick}>
+          <ReactSVG src={Lupa} className="w-[20px] h-[20px] text-[rgb(120,220,220)]" />
+        </button>
+        {resultAutocomplete()}
+      </div>
+    </form>
   );
 };
 
@@ -144,7 +141,16 @@ const searcher = () => {
     <div className="bg-[#f1efe7] min-h-screen m-0 p-0 flex flex-col h-[100vh]">
       <header>
       </header>
-      {SearcherForm()}
+
+      <div className="flex flex-col justify-center items-center h-[90vh]">
+        <img className="w-1/5 max-w-[100px] h-auto mb-5" src="logo.png" alt="Logo" />
+        <SearcherForm></SearcherForm>
+        <SearcherForm></SearcherForm>
+        <SearcherForm></SearcherForm>
+        <SearcherForm></SearcherForm>
+        <SearcherForm></SearcherForm>
+        <SearcherForm></SearcherForm>
+      </div>
       <footer className='text-center px-5 pb-5'>
         Este site foi criado como parte de um projeto do curso de programação web na UFOP (Universidade Federal de Ouro Preto).
       </footer>
