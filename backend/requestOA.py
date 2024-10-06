@@ -1,16 +1,21 @@
 import requests
 from flask import jsonify
 
-def requestOpenAlex(params):
+def requestOpenAlex(params, get=""):
     url = "https://api.openalex.org/" + params
     
+    # print(url)
     response = requests.get(url)
     # Verifica si la respuesta fue exitosa
     if response.status_code != 200:
         return None, response.status_code
 
     # Obtiene los resultados de la respuesta
-    results = response.json().get("results", [])
+    if get!="":
+        results = response.json().get(get, [])
+    else:
+        results = response.json()
+
     return results, None  # Devuelve los resultados y None como error
 
 # # Uso de la función en otro lugar
