@@ -35,18 +35,30 @@ def get_search_metrics():
 @search_metrics.route('/get_search_openaccess', methods=['GET'])
 def get_search_openaccess():
     query = request.args.get('query', '')
-    query = request.args.get('type', 'work')
-
+    # https://api.openalex.org/works?group_by=open_access.is_oa&per_page=200&filter=default.search:Brasil
     if not query:
         return jsonify({"error": "Works ID parameter is missing"}), 400
+    
+    url = f"works?group_by=open_access.is_oa&per_page=200&filter=default.search:{query}"
+    
+    response = requestOpenAlex(url,"group_by")
 
-    results = pa.Works().search(query).group_by('publication_year').get()
-
-    results_json = []
-    for result in results:
+    if response is not None:
+        results, _ = response
+        open_count = 0
+        total_count = 0
+        for result in results:
+            if result["key"]=="1":
+                print(result["count"])
+                open_count = result["count"]
+                total_count += result["count"]
+            else:
+                total_count += result["count"]
+                
         element = {
-            "year": result["key"],
-            "count": result["count"]
-        }
-        results_json.append(element)
-    return jsonify(results_json)
+                "open_access": open_count,
+                "total_count": total_count
+            }
+        return jsonify(element)
+    else:
+        return jsonify({"error": "Failed to fetch data from OpenAlex"}), response.status_code
