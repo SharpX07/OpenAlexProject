@@ -1,4 +1,4 @@
-# Activar el entorno virtual si es necesario
+
 cd .\.venv\Scripts
 
 .\Activate.ps1
