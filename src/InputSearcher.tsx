@@ -4,10 +4,18 @@ import SearcherForm from './components/SearcherForm';
 import { QueryResults, QueryResult } from './components/queryResults';
 import OaPagination from './components/oaPagination';
 import { BoxContainer } from './components/boxContainer';
+import Group from './components/Group';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
+import { WorkCard } from './components/WorkCard';
+
+
 // import { OverlayCard } from './components/overlayCard';
 import TopContainerMetrics from './components/TopContainerMetrics';
-import { OverlayCard } from './components/overlayCard';
-import { WorkCard } from './components/WorkCard';
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
@@ -57,37 +65,76 @@ const InputPage: React.FC = () => {
     const openCard = (id: string, type: string) => {
         setCardOpened(true);
         setIdCard(id);
-        setTypeCard(type); 
+        setTypeCard(type);
     }
 
     useEffect(() => {
         if (searchValue) {
-            fetchResults(setQueryResult, setResultsLoading, setResultsError, searchValue, page, 3, 'works');
+            fetchResults(setQueryResult, setResultsLoading, setResultsError, searchValue, page, 5, 'works');
         }
     }, [searchValue, page]);
 
-    return (
-        <div className='bg-[#f2f0e8]'>
-            <div className="bg-[#ffffff] flex flex-col justify-center items-center ">
-                <SearcherForm />
-            </div>
-            <TopContainerMetrics searchValue={searchValue} />
-            <BoxContainer>
-                <h1>Resultados de la búsqueda</h1>
-                <p>Buscaste: {searchValue}</p>
+    let lista = ["Art", "de", "dede", "dada", "aea"]
 
-                {resultsLoading ? (
-                    <p>Loading results...</p>
-                ) : resultsError ? (
-                    <p>Error loading results: {resultsError.message}</p>
-                ) : (
-                    <QueryResults results={queryResult} type="work" onClickItem={openCard} />
-                )}
-                <OaPagination page={page} setPage={setPage} />
-            </BoxContainer>
-            {cardOpened && (
-                <WorkCard idCard={idCard} setCardOpened={setCardOpened} />
-            )}
+    return (
+        <div className='bg-[#f2f0e8]' >
+            <div className="bg-[#ffffff] flex flex-col justify-center items-center py-1 z-50"><SearcherForm></SearcherForm></div>
+            <div><TopContainerMetrics searchValue={searchValue}>
+            </TopContainerMetrics>
+            </div>
+            {/* {renderPagination()} */}
+            {/* </BoxContainer> */}
+            <div className="flex flex-row justify-between">
+                <div className='w-[20%] px-4'>
+                    <h1 className="font-semibold text-xl pl-2">Filter</h1>
+                    <BoxContainer>
+                        <Accordion type="single" defaultValue='item-1'>
+                            <AccordionItem value="item-1">
+                                <AccordionTrigger>TOPIC</AccordionTrigger>
+                                <AccordionContent>
+                                    {lista.map((result) => {
+                                        return (<Group text={result}></Group>);
+                                    })}
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-2">
+                                <AccordionTrigger>INSTITUTION</AccordionTrigger>
+                                <AccordionContent>
+                                    {lista.map((result) => {
+                                        return (<Group text={result}></Group>);
+                                    })}
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-3">
+                                <AccordionTrigger>TYPE</AccordionTrigger>
+                                <AccordionContent>
+                                    {lista.map((result) => {
+                                        return (<Group text={result}></Group>);
+                                    })}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </BoxContainer>
+                </div>
+                <div className='w-[80%] pr-4'>
+                    <div className='flex'><h1 className="font-semibold text-xl pl-2">Works</h1><p className='content-end pl-2 text-sm'>Searched: {searchValue}</p>
+                    </div>
+                    <BoxContainer>
+
+                        {resultsLoading ? (
+                            <p>Loading results...</p>
+                        ) : resultsError ? (
+                            <p>Error loading results: {resultsError.message}</p>
+                        ) : (
+                            <QueryResults results={queryResult} type="work" onClickItem={openCard} />
+                        )}
+                    </BoxContainer>
+                    <div className="p-2"><OaPagination page={page} setPage={setPage} /></div>
+                    {cardOpened && (
+                        <WorkCard idCard={idCard} setCardOpened={setCardOpened} />
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

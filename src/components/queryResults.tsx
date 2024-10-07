@@ -1,4 +1,5 @@
 import React from 'react';
+import { BoxContainer } from './boxContainer';
 
 export interface QueryResult {
     type: 'work';
@@ -23,11 +24,9 @@ export const QueryResults: React.FC<QueryResultsProps> = ({ results, type , onCl
         <ul>
             {results.map((result, index) => {
                 return (
-                    <li className='bg-white hover:bg-[#d5bdaf] rounded-lg p-4 m-2 border border-[#d5bdaf]
-                    ' key={index} onClick={() => onClickItem(result.id, type)}>
-                        <h3>{result.principal_value}</h3>
-                        <p>Fecha de publicación: {result.secondary_value}</p>
-                        <p>Idioma: {result.tertiary_value}</p>
+                    <li key={index} className="py-1 rounded-lg border-solid border-inherit hover:bg-[#d5bdaf] transition-colors duration-200 cursor-pointer" onClick={() => onClickItem(result.id, type)} >
+                        <h3 className="font-bold ">{result.principal_value}</h3>
+                        <p className="text-xs">Fecha de publicación: {result.secondary_value}</p>
                         {/* <p>Idioma: {result.id}</p> */}
                         {/* <p>Resumen: {result.abstract}</p> */}
                     </li>

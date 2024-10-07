@@ -1,4 +1,5 @@
 import { Chart } from "react-google-charts";
+import { color } from "react-magic-motion";
 
 export interface ResultBarChart {
     year: string;
@@ -19,12 +20,14 @@ const BarChart: React.FC<BarChartProps> = ({ results }) => {
     const data = [["Año", "Cantidad"], ...results.map(result => [result.year, parseInt(result.count)])]; // Asegúrate de que count sea un número
 
     const options = {
-        title: "Resultados de la búsqueda",
         chartArea: { width: "50%" },
         hAxis: {
             title: "Cantidad",
             minValue: 0,
         },
+        title: "YEAR",
+        legend: { position: "none" },
+        colors: ["#826c4a"],
         vAxis: {
             title: "Año",
         },
@@ -34,7 +37,6 @@ const BarChart: React.FC<BarChartProps> = ({ results }) => {
         <Chart
             chartType="BarChart"
             width="100%"
-            height="400px"
             data={data}
             options={options}
         />

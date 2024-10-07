@@ -91,7 +91,7 @@ const SearcherForm = () => {
       return <div
         className={`h-[1%] p-1 m-2 rounded-[20px] border border-[#d5bdaf] ${isSelected ? 'bg-[#d5bdaf]' : 'bg-[#eeeeed]'} cursor-pointer hover:bg-[#d5bdaf] transition-colors duration-200`}
         onClick={() => { setSelectedType(text) }}>
-        <p className='text-x truncate text-left pl-2 pr-2'><b>{text}</b></p>
+        <p className='text-x truncate text-left pl-2 pr-2 '><b>{text}</b></p>
       </div>
     }
 
@@ -110,7 +110,7 @@ const SearcherForm = () => {
         <ul className={`absolute w-full m-0 border border-[#D5BDAF] bg-[#f8f8f7] rounded-b-[20px] transition-all duration-300 ease-in-out ${isVisible ? 'opacity-100 translate-y-[50px] -translate-x-[1px]' : 'opacity-[50px] -translate-y-4 -translate-x-[1px]'}`}>
           {data.slice(0, 5).map((result, index) => (
             <li className='h-[1%] p-2 m-0 rounded-none bg-transparent hover:bg-[#d5bdaf]' key={index} onClick={() => handleSearchSelection(selectedType, result.id)}>
-              <p className='text-x truncate text-left text-x font-sans font-light'><b>{result.principal_value}</b></p>
+              <p className='text-x truncate text-left text-x font-sans font-light '><b>{result.principal_value}</b></p>
             </li>
           ))}
         </ul>
