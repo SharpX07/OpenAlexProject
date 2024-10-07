@@ -8,12 +8,13 @@ import { OverlayCard } from './components/overlayCard';
 import PieChartOpenAccess, { ResultPieChartOpenAccess } from "./components/pieOpenAccessChart";
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import Group from './components/Group';
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
-  } from "@/components/ui/accordion"
+} from "@/components/ui/accordion"
 
 
 // import { OverlayCard } from './components/overlayCard';
@@ -67,60 +68,49 @@ const InputPage: React.FC = () => {
         }
     }, [searchValue, page]);
 
+    let lista = ["Art", "de", "dede", "dada", "aea"]
+
     return (
-        <div className='bg-[#f2f0e8]'>
-            <div className="bg-[#ffffff] flex flex-col justify-center items-center "><SearcherForm></SearcherForm></div>
-            <TopContainerMetrics searchValue={searchValue}>
+        <div className='bg-[#f2f0e8]' >
+            <div className="bg-[#ffffff] flex flex-col justify-center items-center py-1 z-50"><SearcherForm></SearcherForm></div>
+            <div><TopContainerMetrics searchValue={searchValue}>
             </TopContainerMetrics>
+            </div>
             {/* {renderPagination()} */}
             {/* </BoxContainer> */}
-            <div >
-                <BoxContainer>
-                <Accordion type="multiple" className="w-full">
-                    <AccordionItem value="item-1">
-                        <AccordionTrigger>TOPIC</AccordionTrigger>
-                        <AccordionContent>
-                            <div>
-                                <div className="flex items-center space-x-2">
-                                <Checkbox id="terms" />
-                                <label
-                                    htmlFor="terms"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Article
-                                </label>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="flex items-center space-x-2">
-                                <Checkbox id="terms" />
-                                <label
-                                    htmlFor="terms"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Book-Chapter
-                                </label>
-                                </div>
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-2">
-                        <AccordionTrigger>INSTITUTION</AccordionTrigger>
-                        <AccordionContent>
-                        Yes. It comes with default styles that matches the other
-                        components&apos; aesthetic.
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-3">
-                        <AccordionTrigger>TYPE</AccordionTrigger>
-                        <AccordionContent>
-                        Yes. It&apos;s animated by default, but you can disable it if you
-                        prefer.
-                        </AccordionContent>
-                    </AccordionItem>
-                    </Accordion>
-                </BoxContainer>
-                <BoxContainer>
+            <div className="flex flex-row justify-between">
+                <div className='w-[20%] px-4'>
+                    <BoxContainer>
+                        <Accordion type="single" defaultValue='item-1'>
+                            <AccordionItem value="item-1">
+                                <AccordionTrigger>TOPIC</AccordionTrigger>
+                                <AccordionContent>
+                                    {lista.map((result) => {
+                                        return (<Group text={result}></Group>);
+                                    })}
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-2">
+                                <AccordionTrigger>INSTITUTION</AccordionTrigger>
+                                <AccordionContent>
+                                    {lista.map((result) => {
+                                        return (<Group text={result}></Group>);
+                                    })}
+                                </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="item-3">
+                                <AccordionTrigger>TYPE</AccordionTrigger>
+                                <AccordionContent>
+                                    {lista.map((result) => {
+                                        return (<Group text={result}></Group>);
+                                    })}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </BoxContainer>
+                </div>
+                <div className='w-[80%] pr-4'>
+                    <BoxContainer>
                         <h1>Resultados de la búsqueda</h1>
                         <p>Buscaste: {searchValue}</p>
 
@@ -131,8 +121,10 @@ const InputPage: React.FC = () => {
                         ) : (
                             <QueryResults results={queryResult} type="work" />
                         )}
-                </BoxContainer>
-                <OaPagination page={page} setPage={setPage} />
+                    </BoxContainer>
+                    <div className="pt-3"><OaPagination page={page} setPage={setPage}/></div>
+                    
+                </div>
             </div>
         </div>
     );
