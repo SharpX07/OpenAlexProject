@@ -9,11 +9,11 @@ import {
     PaginationContent,
     PaginationEllipsis,
     PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
+    PaginationLink
 } from "@/components/ui/pagination"
 import { BoxContainer } from './components/boxContainer';
+import { OverlayCard } from './components/overlayCard';
+
 
 
 const useQuery = () => {
@@ -111,19 +111,7 @@ const InputPage: React.FC = () => {
         return (
             <Pagination>
                 <PaginationContent>
-                    <PaginationItem>
-                        <PaginationPrevious
-                            href="#"
-                            onClick={() => setPage(prevPage => Math.max(prevPage - 1, 1))}
-                        />
-                    </PaginationItem>
                     {renderNumberPagination()}
-                    <PaginationItem>
-                        <PaginationNext
-                            href="#"
-                            onClick={() => setPage(prevPage => Math.min(prevPage + 1, 100))}
-                        />
-                    </PaginationItem>
                 </PaginationContent>
             </Pagination>
         )
@@ -135,7 +123,7 @@ const InputPage: React.FC = () => {
         for (let i = 1; i <= totalPages; i++) {
             if (i <= 2 || i >= totalPages - 1 || (i >= page - 1 && i <= page + 1)) {
                 pageNumbers.push(
-                    <PaginationItem key={i}>
+                    <PaginationItem key={i} className='bg-[#f2f0e8] border border-[#d5bdaf] rounded-[11px] p-0 m-0'>
                         <PaginationLink href="#" onClick={() => setPage(i)}>
                             {i}
                         </PaginationLink>
@@ -164,11 +152,8 @@ const InputPage: React.FC = () => {
                 ) : (
                     <QueryResults results={queryResult} type="work" />
                 )}
-            </BoxContainer>
-            {/* {renderBarChart(barchartResults, chartLoading, chartError)} */}
-
-
             {renderPagination()}
+            </BoxContainer>
         </div>
     );
 };
