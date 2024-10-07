@@ -29,7 +29,7 @@ const renderNumberPagination = (page: number, setPage: React.Dispatch<React.SetS
     for (let i = 1; i <= totalPages; i++) {
         if (i <= 2 || i >= totalPages - 1 || (i >= page - 1 && i <= page + 1)) {
             pageNumbers.push(
-                <PaginationItem key={i} className='bg-[#f2f0e8] border border-[#d5bdaf] rounded-[11px] p-0 m-0'>
+                <PaginationItem key={i} className='bg-[#ffffff] border border-[#d5bdaf] rounded-[11px] p-0 m-0'>
                     <PaginationLink href="#" onClick={() => setPage(i)}>
                         {i}
                     </PaginationLink>

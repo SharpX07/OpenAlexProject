@@ -64,7 +64,7 @@ const InputPage: React.FC = () => {
 
     useEffect(() => {
         if (searchValue) {
-            fetchResults(setQueryResult, setResultsLoading, setResultsError, searchValue, page, 3, 'works');
+            fetchResults(setQueryResult, setResultsLoading, setResultsError, searchValue, page, 5, 'works');
         }
     }, [searchValue, page]);
 
@@ -80,6 +80,7 @@ const InputPage: React.FC = () => {
             {/* </BoxContainer> */}
             <div className="flex flex-row justify-between">
                 <div className='w-[20%] px-4'>
+                    <h1 className="font-semibold text-xl pl-2">Filter</h1>
                     <BoxContainer>
                         <Accordion type="single" defaultValue='item-1'>
                             <AccordionItem value="item-1">
@@ -110,10 +111,10 @@ const InputPage: React.FC = () => {
                     </BoxContainer>
                 </div>
                 <div className='w-[80%] pr-4'>
+                    <div className='flex'><h1 className="font-semibold text-xl pl-2">Works</h1><p className='content-end pl-2 text-sm'>Searched: {searchValue}</p>
+                    </div>
                     <BoxContainer>
-                        <h1>Resultados de la búsqueda</h1>
-                        <p>Buscaste: {searchValue}</p>
-
+                        
                         {resultsLoading ? (
                             <p>Loading results...</p>
                         ) : resultsError ? (
@@ -122,7 +123,7 @@ const InputPage: React.FC = () => {
                             <QueryResults results={queryResult} type="work" />
                         )}
                     </BoxContainer>
-                    <div className="pt-3"><OaPagination page={page} setPage={setPage}/></div>
+                    <div className="p-2"><OaPagination page={page} setPage={setPage}/></div>
                     
                 </div>
             </div>

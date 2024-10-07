@@ -1,4 +1,5 @@
 import React from 'react';
+import { BoxContainer } from './boxContainer';
 
 export interface QueryResult {
     type: 'work';
@@ -21,10 +22,9 @@ export const QueryResults: React.FC<BarChartProps> = ({ results, type }) => {
         <ul>
             {results.map((result, index) => {
                 return (
-                    <li key={index}>
-                        <h3>{result.principal_value}</h3>
-                        <p>Fecha de publicación: {result.secondary_value}</p>
-                        <p>Idioma: {result.tertiary_value}</p>
+                    <li key={index} className="py-1 rounded-lg border-solid border-inherit">
+                        <h3 className="font-bold ">{result.principal_value}</h3>
+                        <p className="text-xs">Fecha de publicación: {result.secondary_value}</p>
                         {/* <p>Idioma: {result.id}</p> */}
                         {/* <p>Resumen: {result.abstract}</p> */}
                     </li>

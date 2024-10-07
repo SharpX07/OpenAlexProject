@@ -18,7 +18,8 @@ const PieChartOpenAccess: React.FC<PieChartProps> = ({ results }) => {
   ];
 
   const options = {
-    title: "Open Access",
+    colors: ["#bfa986", "#826c4a"],
+    title: "Open Access"
   };
 
   return (
