@@ -1,6 +1,4 @@
 import { Chart } from "react-google-charts";
-import { color } from "react-magic-motion";
-
 export interface ResultBarChart {
     year: string;
     count: string; // Cambia a number si tu API retorna un número

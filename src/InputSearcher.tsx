@@ -46,7 +46,16 @@ const fetchResults = async (
     }
 };
 
+interface FilterObject {
+    name: string;
+    count: string;
+}
 
+interface Filters {
+    topic: FilterObject[];
+    institution: FilterObject[];
+    type: FilterObject[];
+}
 
 
 const InputPage: React.FC = () => {
@@ -62,6 +71,12 @@ const InputPage: React.FC = () => {
     const [idCard, setIdCard] = useState<string>('');
     const [typeCard, setTypeCard] = useState<string>('');
 
+    const [filters, setFilters] = useState<Filters>();
+    const [filtersLoading, setFiltersLoading] = useState(true);
+    const [filtersError, setFiltersError] = useState<Error | null>(null);
+
+
+
     const openCard = (id: string, type: string) => {
         setCardOpened(true);
         setIdCard(id);
@@ -71,13 +86,29 @@ const InputPage: React.FC = () => {
     useEffect(() => {
         if (searchValue) {
             fetchResults(setQueryResult, setResultsLoading, setResultsError, searchValue, page, 5, 'works');
+            fetchFilters();
+
         }
     }, [searchValue, page]);
 
-    let lista = ["Art", "de", "dede", "dada", "aea"]
+    // let lista = ["Art", "de", "dede", "dada", "aea"]
+    const fetchFilters = async () => {
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/get_results_filters?query=${searchValue}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data: Filters = await response.json();
+            setFilters(data);
+        } catch (error) {
+            setFiltersError(error instanceof Error ? error : new Error('Unknown error'));
+        } finally {
+            setFiltersLoading(false);
+        }
+    }
 
     return (
-        <div className='bg-[#f2f0e8]' >
+        <div className='bg-[#f2f0e8] flex flex-col justify-between h-screen' >
             <div className="bg-[#ffffff] flex flex-col justify-center items-center py-1 z-50"><SearcherForm></SearcherForm></div>
             <div><TopContainerMetrics searchValue={searchValue}>
             </TopContainerMetrics>
@@ -92,24 +123,33 @@ const InputPage: React.FC = () => {
                             <AccordionItem value="item-1">
                                 <AccordionTrigger>TOPIC</AccordionTrigger>
                                 <AccordionContent>
-                                    {lista.map((result) => {
-                                        return (<Group text={result}></Group>);
+                                    {filters?.topic.map((result, index) => {
+                                        if (index >= 5) {
+                                            return null;
+                                        }
+                                        return (<Group text={result.name + " - [" + result.count + "]"}></Group>);
                                     })}
                                 </AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="item-2">
                                 <AccordionTrigger>INSTITUTION</AccordionTrigger>
                                 <AccordionContent>
-                                    {lista.map((result) => {
-                                        return (<Group text={result}></Group>);
+                                    {filters?.institution.map((result, index) => {
+                                        if (index >= 5) {
+                                            return null;
+                                        }
+                                        return (<Group text={result.name + " - [" + result.count + "]"}></Group>);
                                     })}
                                 </AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="item-3">
                                 <AccordionTrigger>TYPE</AccordionTrigger>
                                 <AccordionContent>
-                                    {lista.map((result) => {
-                                        return (<Group text={result}></Group>);
+                                    {filters?.type.map((result, index) => {
+                                        if (index >= 5) {
+                                            return null;
+                                        }
+                                        return (<Group text={result.name + " - [" + result.count + "]"}></Group>);
                                     })}
                                 </AccordionContent>
                             </AccordionItem>
@@ -130,11 +170,12 @@ const InputPage: React.FC = () => {
                         )}
                     </BoxContainer>
                     <div className="p-2"><OaPagination page={page} setPage={setPage} /></div>
-                    {cardOpened && (
-                        <WorkCard idCard={idCard} setCardOpened={setCardOpened} />
-                    )}
+
                 </div>
             </div>
+            {cardOpened && (
+                <WorkCard idCard={idCard} setCardOpened={setCardOpened} />
+            )}
         </div>
     );
 };

@@ -75,15 +75,15 @@ def get_results():
                 "principal_value": result["display_name"],
                 "id": result["id"].split("/")[-1]
             }
-            if query_type == "author":
+            if query_type == "authors":
                 element["secondary_value"] = result.get("works_count", 0)
                 element["tertiary_value"] =  result.get("cited_by_count", 0)
                 
-            elif query_type == "work":
-                element["secondary_value"] = result.get("hint", '')
+            elif query_type == "works":
+                element["secondary_value"] = result.get("publication_year", '')
                 element["tertiary_value"] =  result.get("cited_by_count", 0)
             
-            elif query_type == "institution":
+            elif query_type == "institutions":
                 element["secondary_value"] = result.get("works_count", 0)
                 element["tertiary_value"] =  result.get("cited_by_count", 0)
             
@@ -91,6 +91,60 @@ def get_results():
         return jsonify(results_json)
     else:
         return jsonify({"error": "Failed to fetch data from OpenAlex"}), response.status_code
+# https://api.openalex.org/works?group_by=type&per_page=200&filter=default.search:Brasil
+
+@app.route('/get_results_filters', methods=['GET'])
+def get_results_filters():
+    query = request.args.get('query', '')
+    # id_query = request.args.get('id_query', '')
+    if not query:
+        return jsonify({"error": "ID parameter is missing"}), 400
+
+    url = f"works?group_by=type&per_page=200&filter=default.search:{query}"
+    response_type = requestOpenAlex(url,"group_by")
+    
+    url = f"works?group_by=primary_topic.id&per_page=200&filter=default.search:{query}"
+    response_topic = requestOpenAlex(url,"group_by")
+    
+    url = f"works?group_by=authorships.institutions.lineage&per_page=200&filter=default.search:{query}"
+    response_institutions = requestOpenAlex(url,"group_by")
+    
+    filters = {}
+    
+    for response in [("type",response_type), ("topic", response_topic), ("institution", response_institutions)]:
+        if response[1] is not None:
+            results,_ = response[1]
+            results_json = []
+            for result in results:
+                element = {
+                    "name": result["key_display_name"],
+                    "count": result["count"]
+                }
+                results_json.append(element)
+            filters[response[0]] = results_json
+        else:
+            filters[response[0]] = []
+    return jsonify(filters)
+        
+@app.route('/get_information_results', methods=['GET'])
+def get_information_results():
+    query = request.args.get('query', '')
+    # id_query = request.args.get('id_query', '')
+    if not query:
+        return jsonify({"error": "ID parameter is missing"}), 400
+
+    url = f"works?search={query}"
+
+    response = requestOpenAlex(url)
+
+    if response is not None:
+        element = {
+            "count" : response[0]["meta"]["count"]
+        }
+        return jsonify(element)
+    else:
+        return jsonify({"error": "Failed to fetch data from OpenAlex"}), response.status_code
+
 
 def create_generic_text(inverted_index):
     words = list(inverted_index.keys())
@@ -121,13 +175,17 @@ def get_work_info():
         element = {
             "publication_year" : response[0]["publication_year"],
             "type" : response[0]["type"],
-            "source" : response[0]["primary_location"]["source"]["display_name"],
             "authorships" : authors,
             "title" : response[0]["title"],
             "cited_by_count" : response[0]["cited_by_count"],
             "publication_date" : response[0]["publication_year"],
             # "institutions" : 
         }
+        if response[0]["primary_location"]["source"] != None:
+            element["source"] = response[0]["primary_location"]["source"]["display_name"]
+        else:
+            element["source"] = None
+            
         if response[0]["primary_topic"] != None:
             element["primary_topic"] = response[0]["primary_topic"]["display_name"]
             element["field"] = response[0]["primary_topic"]["field"]["display_name"]

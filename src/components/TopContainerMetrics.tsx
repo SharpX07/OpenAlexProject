@@ -3,6 +3,7 @@ import { BoxContainer } from './boxContainer';
 import { ResultBarChart, renderBarChart } from './barChart';
 import { ResultPieChartOpenAccess, renderPieChart } from "./pieOpenAccessChart";
 import BarChart from './barChart';
+import { InformationBox, ResultInformation } from './informationBox'
 
 const fetchChart = async (
     setResults: React.Dispatch<React.SetStateAction<ResultBarChart[]>>,
@@ -46,6 +47,29 @@ const fetchOpenAcess = async (
     }
 }
 
+const fetchInformation = async (
+    setResults: React.Dispatch<React.SetStateAction<ResultInformation | undefined>>,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    setError: React.Dispatch<React.SetStateAction<Error | null>>,
+    searchValue: string,
+) => {
+    setLoading(true);
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/get_information_results?query=${searchValue}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data: ResultInformation = await response.json();
+        setResults(data);
+    } catch (error) {
+        setError(error instanceof Error ? error : new Error('Unknown error'));
+    } finally {
+        setLoading(false);
+    }
+}
+
+
+
 interface TopContainerMetricsProps {
     searchValue: string | null;
 }
@@ -65,6 +89,10 @@ const TopContainerMetrics: React.FC<TopContainerMetricsProps> = ({ searchValue }
     const [chartError, setChartError] = useState<Error | null>(null);
     const [chartLoading, setChartLoading] = useState(true);
 
+    const [informationResults, setInformationResults] = useState<ResultInformation | undefined>(undefined);
+    const [informationLoading, setInformationLoading] = useState(true);
+    const [informationError, setInformationError] = useState<Error | null>(null);
+
     useEffect(() => {
         if (searchValue) {
             fetchChart(setBarchartResults, setChartLoading, setChartError, searchValue);
@@ -72,38 +100,27 @@ const TopContainerMetrics: React.FC<TopContainerMetricsProps> = ({ searchValue }
         if (searchValue) {
             fetchOpenAcess(setPiechartResult, setPiechartLoading, setPiechartError, searchValue);
         }
+        if (searchValue) {
+            fetchInformation(setInformationResults, setInformationLoading, setInformationError, searchValue);
+        }
     }, [searchValue]);
 
     return (
         <div className="flex items-center justify-around py-5">
-                <div className="w-[20%] h-[25%]">
+            <div className="w-[20%] h-[25%]">
                 <BoxContainer>
-                <BarChart results={barchartResults} />
-                    {/* {renderBarChart(barchartResults, chartLoading, chartError)} */}
+                    {/* <BarChart results={barchartResults} /> */}
+                    {renderBarChart(barchartResults, chartLoading, chartError)}
                 </BoxContainer>
-                </div>
-                <div className="w-[20%] h-[25%]">
-                <BoxContainer>
-                {renderPieChart(PiechartResult, PiechartLoading, PiechartError)}
-                </BoxContainer>
-                </div>
-                <div className="w-[20%] h-[25%]">
-                <BoxContainer>
-                    <h1 className='justify-around font-extrabold text-xl'>Informations:</h1>
-                    <div className='leading-[2.5]'>
-                        <p>Results:</p>
-                        <p>Citations:</p>
-                        <p>APC Sums:</p>    
-                    </div>
-                    <div className='flex items-center justify-around text-bold text-xl'>
-                    <p>80000</p><p>7000</p>
-                    </div> 
-                    <div className='flex items-center justify-around text-xs'>
-                    <p>Sums APC's paid (est)</p><p>Sums APC's list (est)</p>
-                    </div>                   
-                </BoxContainer>
-                </div>
             </div>
+            <div className="w-[20%] h-[25%]">
+                <BoxContainer>
+                    {renderPieChart(PiechartResult, PiechartLoading, PiechartError)}
+                </BoxContainer>
+            </div>
+            <InformationBox results={informationResults
+            }></InformationBox>
+        </div>
     )
 }
 

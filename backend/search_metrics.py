@@ -21,12 +21,16 @@ def get_search_metrics():
     results_json = []
     if response is not None:
         results, _ = response
+        cant = 0
         for result in results:
             element = {
                 "year": result["key"],
                 "count": result["count"]
             }
             results_json.append(element)
+            cant+=1
+            if cant == 15:
+                break
         return jsonify(results_json)
     else:
         return jsonify({"error": "Failed to fetch data from OpenAlex"}), response.status_code
