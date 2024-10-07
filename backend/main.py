@@ -92,47 +92,59 @@ def get_results():
     else:
         return jsonify({"error": "Failed to fetch data from OpenAlex"}), response.status_code
 
-# @app.route('/search', methods=['GET'])
-# def get_search():
-#     query = request.args.get('id_query', '')
-#     query_type = request.args.get('type', 'author')
+def create_generic_text(inverted_index):
+    words = list(inverted_index.keys())
+    return ' '.join(words)
+
+def truncate_text(text, max_words=100):
+    words = text.split()
+    if len(words) > max_words:
+        return ' '.join(words[:max_words]) + '...'
+    return text
+
+@app.route('/get_work_info', methods=['GET'])
+def get_work_info():
+    id_query = request.args.get('id_query', '')
     
-#     if not query:
-#         return jsonify({"error": "Query parameter is missing"}), 400
-#     elif query_type == "work":
-#         result = pa.Works()[query]
-#         result_json = {
-#             "type" : result["type"],
-#             "title" : result["title"],
-#             "publication_date" : result["publication_date"],
-#             "language" : result["language"],
-#             "abstract" : result["abstract"],
-#         }
-#         return jsonify(result_json)
-#     elif query_type == "author":
-#         result = pa.Authors()[query]
-#         result_json = {
-#             "type" : result["type"],
-#             "display_name" : result["display_name"],
-#             "works_count" : result["works_count"],
-#             "cited_by_count" : result["cited_by_count"],
-#             "affiliations" : result["affiliations"],
-#             "research_interests" : result["research_interests"],
-#         }
-#         return jsonify(result_json)
-#     elif query_type == "institution":
-#         result = pa.Institutions()[query]
-#         result_json = {
-#             "type" : result["type"],
-#             "display_name" : result["display_name"],
-#             "works_count" : result["works_count"],
-#             "cited_by_count" : result["cited_by_count"],
-#             "affiliations" : result["affiliations"],
-#             "research_interests" : result["research_interests"],
-#         }
-#         return jsonify(result_json)
-#     else:
-#         return jsonify({"error": "Invalid query type"}), 400
+    if not id_query:
+        return jsonify({"error": "ID parameter is missing"}), 400
+
+    url = f"works/{id_query}"
+
+    response = requestOpenAlex(url)
+
+    if response is not None:
+        authors = []
+        for author in response[0]["authorships"]:
+            authors.append(author["author"]["display_name"])
+        
+        element = {
+            "publication_year" : response[0]["publication_year"],
+            "type" : response[0]["type"],
+            "source" : response[0]["primary_location"]["source"]["display_name"],
+            "authorships" : authors,
+            "title" : response[0]["title"],
+            "cited_by_count" : response[0]["cited_by_count"],
+            "publication_date" : response[0]["publication_year"],
+            # "institutions" : 
+        }
+        if response[0]["primary_topic"] != None:
+            element["primary_topic"] = response[0]["primary_topic"]["display_name"]
+            element["field"] = response[0]["primary_topic"]["field"]["display_name"]
+            element["subfield"] = response[0]["primary_topic"]["subfield"]["display_name"]
+            element["domain"] = response[0]["primary_topic"]["domain"]["display_name"]
+        else:
+            element["primary_topic"] = None 
+            element["field"] = None
+            element["subfield"] = None
+            element["domain"] = None
+        if response[0]["abstract_inverted_index"] != None:
+            element["abstract"] = truncate_text(create_generic_text(response[0]["abstract_inverted_index"]))
+        else:
+            element["abstract"] = None
+        return jsonify(element)
+    else:
+        return jsonify({"error": "Failed to fetch data from OpenAlex"}), response.status_code
 
 
 app.register_blueprint(search_metrics)

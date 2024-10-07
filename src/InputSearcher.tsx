@@ -6,10 +6,11 @@ import OaPagination from './components/oaPagination';
 import { BoxContainer } from './components/boxContainer';
 // import { OverlayCard } from './components/overlayCard';
 import TopContainerMetrics from './components/TopContainerMetrics';
+import { OverlayCard } from './components/overlayCard';
+import { WorkCard } from './components/WorkCard';
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
-
 };
 
 
@@ -39,6 +40,7 @@ const fetchResults = async (
 
 
 
+
 const InputPage: React.FC = () => {
     const query = useQuery();
     const searchValue = query.get('search');
@@ -48,6 +50,15 @@ const InputPage: React.FC = () => {
     const [queryResult, setQueryResult] = useState<QueryResult[]>([]);
     const [resultsError, setResultsError] = useState<Error | null>(null);
 
+    const [cardOpened, setCardOpened] = useState<boolean>(false);
+    const [idCard, setIdCard] = useState<string>('');
+    const [typeCard, setTypeCard] = useState<string>('');
+
+    const openCard = (id: string, type: string) => {
+        setCardOpened(true);
+        setIdCard(id);
+        setTypeCard(type); 
+    }
 
     useEffect(() => {
         if (searchValue) {
@@ -60,6 +71,7 @@ const InputPage: React.FC = () => {
             <div className="bg-[#ffffff] flex flex-col justify-center items-center ">
                 <SearcherForm />
             </div>
+            <TopContainerMetrics searchValue={searchValue} />
             <BoxContainer>
                 <h1>Resultados de la búsqueda</h1>
                 <p>Buscaste: {searchValue}</p>
@@ -69,11 +81,13 @@ const InputPage: React.FC = () => {
                 ) : resultsError ? (
                     <p>Error loading results: {resultsError.message}</p>
                 ) : (
-                    <QueryResults results={queryResult} type="work" />
+                    <QueryResults results={queryResult} type="work" onClickItem={openCard} />
                 )}
+                <OaPagination page={page} setPage={setPage} />
             </BoxContainer>
-            <TopContainerMetrics searchValue={searchValue}/>
-            <OaPagination page={page} setPage={setPage} />
+            {cardOpened && (
+                <WorkCard idCard={idCard} setCardOpened={setCardOpened} />
+            )}
         </div>
     );
 };

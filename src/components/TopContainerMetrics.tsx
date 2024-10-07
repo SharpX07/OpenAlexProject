@@ -37,7 +37,7 @@ const fetchOpenAcess = async (
             throw new Error('Network response was not ok');
         }
         const data: ResultPieChartOpenAccess = await response.json();
-        setResults(data); // Aquí está bien
+        setResults(data);
     } catch (error) {
         setError(error instanceof Error ? error : new Error('Unknown error'));
     } finally {
@@ -50,12 +50,11 @@ interface TopContainerMetricsProps {
 }
 
 
-const TopContainerMetrics: React.FC<TopContainerMetricsProps> = ({searchValue}) => {
+const TopContainerMetrics: React.FC<TopContainerMetricsProps> = ({ searchValue }) => {
 
     if (searchValue === null) {
         return null;
     }
-
 
     const [PiechartResult, setPiechartResult] = useState<ResultPieChartOpenAccess | undefined>(undefined);
     const [PiechartLoading, setPiechartLoading] = useState(true);
@@ -64,7 +63,7 @@ const TopContainerMetrics: React.FC<TopContainerMetricsProps> = ({searchValue}) 
     const [barchartResults, setBarchartResults] = useState<ResultBarChart[]>([]);
     const [chartError, setChartError] = useState<Error | null>(null);
     const [chartLoading, setChartLoading] = useState(true);
-    
+
     useEffect(() => {
         if (searchValue) {
             fetchChart(setBarchartResults, setChartLoading, setChartError, searchValue);
@@ -76,12 +75,14 @@ const TopContainerMetrics: React.FC<TopContainerMetricsProps> = ({searchValue}) 
 
     return (
         <div className="flex items-center justify-around">
-                
-                <BoxContainer>
-                    {renderBarChart(barchartResults, chartLoading, chartError)}
-                </BoxContainer>
+
+            <BoxContainer>
+                {renderBarChart(barchartResults, chartLoading, chartError)}
+            </BoxContainer>
+            <BoxContainer>
                 {renderPieChart(PiechartResult, PiechartLoading, PiechartError)}
-            </div>
+            </BoxContainer>
+        </div>
     )
 }
 

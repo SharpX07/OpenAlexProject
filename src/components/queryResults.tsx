@@ -5,14 +5,16 @@ export interface QueryResult {
     principal_value: string;
     secondary_value: string;
     tertiary_value: string;
+    id: string;
 }
 
-interface BarChartProps {
+interface QueryResultsProps {
     results: QueryResult[];
     type: 'work' | 'author' | 'institution';
+    onClickItem: (id: string, type: string) => void;
 }
 
-export const QueryResults: React.FC<BarChartProps> = ({ results, type }) => {
+export const QueryResults: React.FC<QueryResultsProps> = ({ results, type , onClickItem}) => {
     if (results.length === 0) {
         return <p>No hay datos para mostrar.</p>;
     }
@@ -21,7 +23,8 @@ export const QueryResults: React.FC<BarChartProps> = ({ results, type }) => {
         <ul>
             {results.map((result, index) => {
                 return (
-                    <li key={index}>
+                    <li className='bg-white hover:bg-[#d5bdaf] rounded-lg p-4 m-2 border border-[#d5bdaf]
+                    ' key={index} onClick={() => onClickItem(result.id, type)}>
                         <h3>{result.principal_value}</h3>
                         <p>Fecha de publicación: {result.secondary_value}</p>
                         <p>Idioma: {result.tertiary_value}</p>
