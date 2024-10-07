@@ -181,8 +181,11 @@ def get_work_info():
             "publication_date" : response[0]["publication_year"],
             # "institutions" : 
         }
-        if response[0]["primary_location"]["source"] != None:
-            element["source"] = response[0]["primary_location"]["source"]["display_name"]
+        if response[0]["primary_location"] != None:
+            if response[0]["primary_location"]["source"] != None:
+                element["source"] = response[0]["primary_location"]["source"]["display_name"]
+            else:
+                element["source"] = None
         else:
             element["source"] = None
             
