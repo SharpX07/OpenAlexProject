@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import BarChart from './components/barChart';
-import pieChartOpenAccess from './components/pieOpenAccessChart';
 import SearcherForm from './components/SearcherForm';
 import { ResultBarChart } from './components/barChart';
 import { QueryResults, QueryResult } from './components/queryResults';
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink
-} from "@/components/ui/pagination"
+import OaPagination from './components/oaPagination';
 import { BoxContainer } from './components/boxContainer';
 import { OverlayCard } from './components/overlayCard';
-import { PieChart } from 'lucide-react';
+import PieChartOpenAccess, { ResultPieChartOpenAccess } from "./components/pieOpenAccessChart";
+
+
 
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
-    
+
 };
 
 const fetchChart = async (
@@ -44,7 +39,7 @@ const fetchChart = async (
 };
 
 const fetchOpenAcess = async (
-    setResults: React.Dispatch<React.SetStateAction<QueryResult[]>>,
+    setResults: React.Dispatch<React.SetStateAction<ResultPieChartOpenAccess | undefined>>,
     setLoading: React.Dispatch<React.SetStateAction<boolean>>,
     setError: React.Dispatch<React.SetStateAction<Error | null>>,
     searchValue: string,
@@ -55,14 +50,15 @@ const fetchOpenAcess = async (
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        const data: QueryResult[] = await response.json();
-        setResults(data);
+        const data: ResultPieChartOpenAccess = await response.json();
+        setResults(data); // Aquí está bien
     } catch (error) {
         setError(error instanceof Error ? error : new Error('Unknown error'));
     } finally {
         setLoading(false);
     }
 }
+
 
 
 const fetchResults = async (
@@ -108,6 +104,25 @@ const renderBarChart = (results: ResultBarChart[], chartLoading: boolean, chartE
 };
 
 
+const renderPieChart = (results: ResultPieChartOpenAccess | undefined, chartLoading: boolean, chartError: Error | null) => {
+    if (results === undefined) {
+        return <p>No hay datos para mostrar.</p>;
+    }
+
+    return (
+        <>
+            {chartLoading ? (
+                <p>Loading chart...</p>
+            ) : chartError ? (
+                <p>Error loading chart: {chartError.message}</p>
+            ) : (
+                <PieChartOpenAccess results={results}></PieChartOpenAccess>
+            )}
+        </>
+    );
+};
+
+
 const InputPage: React.FC = () => {
     const query = useQuery();
     const searchValue = query.get('search');
@@ -118,7 +133,7 @@ const InputPage: React.FC = () => {
     const [resultsLoading, setResultsLoading] = useState(true);
     const [chartError, setChartError] = useState<Error | null>(null);
     const [resultsError, setResultsError] = useState<Error | null>(null);
-    const [PiechartResult, setPiechartResult] = useState<QueryResult[]>([]);
+    const [PiechartResult, setPiechartResult] = useState<ResultPieChartOpenAccess| undefined>(undefined);
     const [PiechartLoading, setPiechartLoading] = useState(true);
     const [PiechartError, setPiechartError] = useState<Error | null>(null);
 
@@ -140,35 +155,7 @@ const InputPage: React.FC = () => {
         }
     }, [searchValue]);
 
-    const renderPagination = () => {
-        return (
-            <Pagination>
-                <PaginationContent>
-                    {renderNumberPagination()}
-                </PaginationContent>
-            </Pagination>
-        )
-    }
-    const renderNumberPagination = () => {
-        const totalPages = 100; // Definir el número total de páginas
-        const pageNumbers = [];
 
-        for (let i = 1; i <= totalPages; i++) {
-            if (i <= 2 || i >= totalPages - 1 || (i >= page - 1 && i <= page + 1)) {
-                pageNumbers.push(
-                    <PaginationItem key={i} className='bg-[#f2f0e8] border border-[#d5bdaf] rounded-[11px] p-0 m-0'>
-                        <PaginationLink href="#" onClick={() => setPage(i)}>
-                            {i}
-                        </PaginationLink>
-                    </PaginationItem>
-                );
-            } else if (i === 3 || i === totalPages - 2) {
-                pageNumbers.push(<PaginationEllipsis key={i} />);
-            }
-        }
-
-        return pageNumbers;
-    };
 
     return (
         <div className='bg-[#f2f0e8]'>
@@ -189,11 +176,15 @@ const InputPage: React.FC = () => {
                 <BoxContainer>
                     {renderBarChart(barchartResults, chartLoading, chartError)}
                 </BoxContainer>
-                {/* <BoxContainer> */}
-                    {/* <pieChartOpenAccess></pieChartOpenAccess> */}
-                {/* </BoxContainer> */}
+                {/* <BoxContainer>
+                </BoxContainer>
+               */}
+                <OverlayCard>
+                    {renderPieChart(PiechartResult, PiechartLoading, PiechartError)}
+                </OverlayCard>
             </div>
-            {renderPagination()}
+            <OaPagination page={page} setPage={setPage} />
+            {/* {renderPagination()} */}
             {/* </BoxContainer> */}
         </div>
     );
