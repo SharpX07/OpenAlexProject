@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import BarChart from './components/barChart';
+import pieChartOpenAccess from './components/pieOpenAccessChart';
 import SearcherForm from './components/SearcherForm';
 import { ResultBarChart } from './components/barChart';
 import { QueryResults, QueryResult } from './components/queryResults';
@@ -14,10 +15,12 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import { BoxContainer } from './components/boxContainer';
+import { PieChart } from 'lucide-react';
 
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
+    
 };
 
 const fetchChart = async (
@@ -40,6 +43,28 @@ const fetchChart = async (
         setLoading(false);
     }
 };
+
+const fetchOpenAcess = async (
+    setResults: React.Dispatch<React.SetStateAction<QueryResult[]>>,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    setError: React.Dispatch<React.SetStateAction<Error | null>>,
+    searchValue: string,
+) => {
+    setLoading(true);
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/get_search_openaccess?query=${searchValue}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data: QueryResult[] = await response.json();
+        setResults(data);
+    } catch (error) {
+        setError(error instanceof Error ? error : new Error('Unknown error'));
+    } finally {
+        setLoading(false);
+    }
+}
+
 
 const fetchResults = async (
     setResults: React.Dispatch<React.SetStateAction<QueryResult[]>>,
@@ -94,6 +119,9 @@ const InputPage: React.FC = () => {
     const [resultsLoading, setResultsLoading] = useState(true);
     const [chartError, setChartError] = useState<Error | null>(null);
     const [resultsError, setResultsError] = useState<Error | null>(null);
+    const [PiechartResult, setPiechartResult] = useState<QueryResult[]>([]);
+    const [PiechartLoading, setPiechartLoading] = useState(true);
+    const [PiechartError, setPiechartError] = useState<Error | null>(null);
 
     useEffect(() => {
         if (searchValue) {
@@ -106,6 +134,12 @@ const InputPage: React.FC = () => {
             fetchResults(setQueryResult, setResultsLoading, setResultsError, searchValue, page, 3, 'works');
         }
     }, [searchValue, page]);
+
+    useEffect(() => {
+        if (searchValue) {
+            fetchOpenAcess(setPiechartResult, setPiechartLoading, setPiechartError, searchValue);
+        }
+    }, [searchValue]);
 
     const renderPagination = () => {
         return (
@@ -151,23 +185,27 @@ const InputPage: React.FC = () => {
 
     return (
         <div className='bg-[#f2f0e8]'>
-            <SearcherForm></SearcherForm>
-            
-            <BoxContainer>
-                <h1>Resultados de la búsqueda</h1>
-                <p>Buscaste: {searchValue}</p>
+            <div className="bg-[#ffffff] flex flex-col justify-center items-center "><SearcherForm></SearcherForm></div>
+            <div className="flex items-center justify-around">
+                <BoxContainer>
+                    <h1>Resultados de la búsqueda</h1>
+                    <p>Buscaste: {searchValue}</p>
 
-                {resultsLoading ? (
-                    <p>Loading results...</p>
-                ) : resultsError ? (
-                    <p>Error loading results: {resultsError.message}</p>
-                ) : (
-                    <QueryResults results={queryResult} type="work" />
-                )}
-            </BoxContainer>
-            {/* {renderBarChart(barchartResults, chartLoading, chartError)} */}
-
-
+                    {resultsLoading ? (
+                        <p>Loading results...</p>
+                    ) : resultsError ? (
+                        <p>Error loading results: {resultsError.message}</p>
+                    ) : (
+                        <QueryResults results={queryResult} type="work" />
+                    )}
+                </BoxContainer>
+                <BoxContainer>
+                    {renderBarChart(barchartResults, chartLoading, chartError)}
+                </BoxContainer>
+                <BoxContainer>
+                    <pieChartOpenAccess></pieChartOpenAccess>
+                </BoxContainer>
+            </div>
             {renderPagination()}
         </div>
     );
