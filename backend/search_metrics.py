@@ -56,7 +56,7 @@ def get_search_openaccess():
                 total_count += result["count"]
                 
         element = {
-                "open_access": open_count,
+                "open_count": open_count,
                 "total_count": total_count
             }
         return jsonify(element)

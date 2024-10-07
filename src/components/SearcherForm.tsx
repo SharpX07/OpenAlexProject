@@ -109,8 +109,8 @@ const SearcherForm = () => {
         </ul>
         <ul className={`absolute w-full m-0 border border-[#D5BDAF] bg-[#f8f8f7] rounded-b-[20px] transition-all duration-300 ease-in-out ${isVisible ? 'opacity-100 translate-y-[50px] -translate-x-[1px]' : 'opacity-[50px] -translate-y-4 -translate-x-[1px]'}`}>
           {data.slice(0, 5).map((result, index) => (
-            <li className='h-[1%] p-2 m-0 rounded-none bg-transparent' key={index} onClick={() => handleSearchSelection(selectedType, result.id)}>
-              <p className='text-x truncate text-left'><b>{result.principal_value}</b></p>
+            <li className='h-[1%] p-2 m-0 rounded-none bg-transparent hover:bg-[#d5bdaf]' key={index} onClick={() => handleSearchSelection(selectedType, result.id)}>
+              <p className='text-x truncate text-left text-x font-sans font-light'><b>{result.principal_value}</b></p>
             </li>
           ))}
         </ul>
@@ -122,7 +122,7 @@ const SearcherForm = () => {
     <form className='w-[90%] flex max-w-[600px]' onSubmit={handleSubmit}>
       <div className="relative w-full">
         <input
-          className={`bg-[#f8f8f7] border border-[#D5BDAF] text-black w-full h-[40px] px-4 py-2 ${isVisible ? 'rounded-t-[12px]' : 'rounded-[12px]'} focus:outline-none pr-[40px]`} // Aumentar padding a la derecha
+          className={`font-sans bg-[#f8f8f7] border border-[#D5BDAF] text-black w-full h-[40px] px-4 py-2 ${isVisible ? 'rounded-t-[12px]' : 'rounded-[12px]'} focus:outline-none pr-[40px]`} // Aumentar padding a la derecha
           type='text'
           placeholder='Procure pesquisadores especializados em sua área...'
           value={searchValue}
