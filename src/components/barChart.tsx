@@ -41,5 +41,23 @@ const BarChart: React.FC<BarChartProps> = ({ results }) => {
     );
 };
 
+export const renderBarChart = (results: ResultBarChart[], chartLoading: boolean, chartError: Error | null) => {
+    if (results.length === 0) {
+        return <p>No hay datos para mostrar.</p>;
+    }
+    return (
+        <>
+            {chartLoading ? (
+                <p>Loading chart...</p>
+            ) : chartError ? (
+                <p>Error loading chart: {chartError.message}</p>
+            ) : (
+                <BarChart results={results} />
+            )}
+        </>
+    );
+};
+
+
 export default BarChart; // Exporta el componente para usarlo en otros archivos
 // export default ResultBarChart

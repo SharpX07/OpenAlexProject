@@ -32,4 +32,21 @@ const PieChartOpenAccess: React.FC<PieChartProps> = ({ results }) => {
   );
 };
 
+export const renderPieChart = (results: ResultPieChartOpenAccess | undefined, chartLoading: boolean, chartError: Error | null) => {
+  if (results === undefined) {
+      return <p>No hay datos para mostrar.</p>;
+  }
+  return (
+      <>
+          {chartLoading ? (
+              <p>Loading chart...</p>
+          ) : chartError ? (
+              <p>Error loading chart: {chartError.message}</p>
+          ) : (
+              <PieChartOpenAccess results={results}></PieChartOpenAccess>
+          )}
+      </>
+  );
+};
+
 export default PieChartOpenAccess;
